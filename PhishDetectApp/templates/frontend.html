@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phishing Email Prediction Interface</title>
+    <style>
+    body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('static/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Header at the top */
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background-color: #0d2a46;
+            color: #fff;
+            font-size: 32px;
+            position: fixed; /* Sticks to top */
+            top: 0;
+            left: 0;
+        }
+
+        /* Main content container */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 100px 50px 50px 50px; /* Padding to account for fixed header */
+        }
+
+        /* Left side textarea */
+        .left-section {
+            display: flex;
+            justify-content: center;
+        }
+
+        textarea {
+            width: 600px;
+            height: 600px;
+            font-size: 16px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent */
+        }
+
+        /* Button container */
+        .textarea-button-container {
+            display: flex;
+            flex-direction: column; /* Stack vertically */
+            align-items: flex-start; /* Align to the left, optional */
+            color:rgb(15, 102, 102);
+        }
+
+        /* Button row */
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            width: 600px;
+            margin-top: 20px;
+        }
+
+        .button-row button {
+            height: 50px;
+            padding: 0 20px;
+            color: rgb(9, 10, 8);
+            font-size: medium;
+            cursor: pointer;
+        }
+
+        #predictBtn {
+            background-color: #0d2a46;
+            color: white;
+        }
+
+        #resetBtn {
+            background-color: #0d2a46;
+            color: white;
+        }
+
+        /* Popup styling */
+        .prediction-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: none;
+        }
+
+        .legitimate {
+            background-color: #2ecc71; /* Green for legitimate */
+        }
+
+        .phishing {
+            background-color: #e74c3c; /* Flashing Red for phishing */
+            animation: flash 0.5s infinite alternate;
+        }
+
+        @keyframes flash {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Phishing Email Detection System</header>
+    <div class="main-container">
+        <div class="left-section">
+            <div class="textarea-button-container">
+                <textarea id="userInput" placeholder="Enter your email here..."></textarea>
+                <div class="button-row">
+                    <button id="predictBtn" onclick="sendData()">Predict</button>
+                    <button id="resetBtn" onclick="resetAll()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction popup -->
+    <div id="predictionPopup" class="prediction-popup">
+        <span id="predictionText"></span>
+    </div>
+
+    <script>
+        function sendData() {
+            const inputText = document.getElementById("userInput").value;
+            
+            if (!inputText.trim()) {
+                alert("Please enter an email to analyze");
+                return;
+            }
+            
+            console.log("Sending to /predict:", inputText);
+
+            fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    input: inputText
+                })
+            })
+            .then(response => {
+                console.log("Response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Received data:", data);
+                showPredictionPopup(data.prediction);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+        }
+
+        function showPredictionPopup(prediction) {
+            const popup = document.getElementById("predictionPopup");
+            const predictionText = document.getElementById("predictionText");
+            
+            // Clearing previous classes
+            popup.classList.remove("legitimate", "phishing");
+            
+            if (prediction.toLowerCase().includes("phishing")) {
+                popup.classList.add("phishing");
+                predictionText.textContent = "PHISHING DETECTED!";
+            } else {
+                popup.classList.add("legitimate");
+                predictionText.textContent = "Email is Legitimate";
+            }
+            
+            // Showing the popup - Stays visible until reset
+            popup.style.display = "block";
+        }
+        
+        function resetAll() {
+            // Clearing the textarea
+            document.getElementById("userInput").value = "";
+            
+            // Hiding the prediction popup
+            document.getElementById("predictionPopup").style.display = "none";
+        }
+    </script>
+</body>
+</html>
