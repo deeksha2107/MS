@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Indian Recipe Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Indian Recipe Generator</h2>
+                <form action="/" method="POST">
+                    <div class="mb-3">
+                        <label for="topic" class="form-label">Enter a Dish Name</label>
+                        <input type="text" class="form-control" id="topic" name="topic" placeholder="e.g., Paneer Butter Masala" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Generate Recipe</button>
+                </form>
+                {% if recipe %}
+                <div class="alert alert-success mt-4" role="alert">
+                    <h5 class="alert-heading">Generated Recipe</h5>
+                    <pre>{{ recipe }}</pre>
+                    {% if pdf_available %}
+                    <a href="{{ url_for('static', filename='recipe.pdf') }}" class="btn btn-outline-secondary mt-3" download>Download Recipe PDF</a>
+                    {% endif %}
+                </div>
+                {% elif error %}
+                <div class="alert alert-danger mt-4" role="alert">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

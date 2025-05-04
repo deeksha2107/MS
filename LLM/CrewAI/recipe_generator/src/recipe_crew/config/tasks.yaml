@@ -1,0 +1,17 @@
+recipe_research_task:
+  description: >
+    Give me a thorough information about the recipe
+    Make sure you give interesting and relevant recipe for the dish proposed
+  expected_output: >
+   A step by step guide of how the dish is to be made
+  agent: recipe_researcher
+
+recipe_writer_task:
+  description: >
+    Review the recipe you got and give the step by step procedure for making the disk.
+    Make sure the recipe is detailed and contains any and all relevant information.
+  expected_output: >
+    A fully detailed recipe with points, each explained with a full deatil of information.
+    Formatted as markdown without '```'
+  agent: recipe_writer
+  output_file: recipe.pdf
